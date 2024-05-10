@@ -161,7 +161,7 @@ def get_communities(browser: RoboBrowser, desired_communities: list):
             return True
         else:
             linkdiv = link.find('div', {'class': "menu-title-mit-tippglocke"})
-            return linkdiv and linkdiv.get_text() == hreftext
+            return linkdiv and linkdiv.get_text().lower() == hreftext
 
     community_list = [gethreftext(link)
                       for link in links if is_community(link)]
@@ -175,8 +175,7 @@ def intersection(a, b):
     return i
 
 
-def place_bets(browser: RoboBrowser, communities: list, predictor, override=False, deadline=None, dryrun=False,
-               matchday=None):
+def place_bets(browser: RoboBrowser, communities: list, predictor, override=False, deadline=None, dryrun=False, matchday=None):
     """Place bets on all given communities."""
     for com in communities:
         print("Community: {0}".format(com))
@@ -190,15 +189,13 @@ def place_bets(browser: RoboBrowser, communities: list, predictor, override=Fals
             input_hometeam_value = submitform[field_hometeam.attrs['name']].value
             input_roadteam_value = submitform[field_roadteam.attrs['name']].value
             if not override and (input_hometeam_value or input_roadteam_value):
-                print("{0} - skipped, already placed {1}:{2}".format(match,
-                                                                     input_hometeam_value, input_roadteam_value))
+                print("{0} - skipped, already placed {1}:{2}".format(match, input_hometeam_value, input_roadteam_value))
                 continue
 
             if deadline is not None:
                 if not is_before_dealine(deadline, match.match_date):
                     time_to_match = match.match_date - datetime.datetime.now()
-                    print("{0} - not betting yet, due in {1}".format(match,
-                                                                     timedelta_tostring(time_to_match)))
+                    print("{0} - not betting yet, due in {1}".format(match, timedelta_tostring(time_to_match)))
                     continue
 
             homebet, roadbet = predictor.predict(match)
@@ -270,9 +267,7 @@ def main(arguments):
     predictor = choose_predictor(predictor_param, predictors_)
 
     # Place bets
-    place_bets(browser, communities, predictor,
-               override=arguments['--override-bets'], deadline=arguments['--deadline'], dryrun=arguments['--dry-run'],
-               matchday=arguments['--matchday'])
+    place_bets(browser, communities, predictor, override=arguments['--override-bets'], deadline=arguments['--deadline'], dryrun=arguments['--dry-run'], matchday=arguments['--matchday'])
 
 
 if __name__ == '__main__':
